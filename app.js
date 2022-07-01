@@ -21,9 +21,9 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/api", routes);
-app.get('/',(req,res) => {
-  res.send('Employee Vote APP started');
-})
+app.get("/", (req, res) => {
+  res.send("Employee Vote APP started");
+});
 
 const port = process.env.PORT || 8000;
 
