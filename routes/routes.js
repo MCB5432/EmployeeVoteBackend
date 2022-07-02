@@ -4,17 +4,22 @@ const employeeModel = require("../models/employee");
 const router = express.Router();
 const multer = require("multer");
 const { default: mongoose } = require("mongoose");
-const upload = multer({ dest: "uploads/" });
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, './pics')
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+    cb(null, Date.now() + '--' + file.originalname)
+  }
+})
 
+const upload = multer({ storage: storage })
 
 router.post("/save-member", upload.single("picture"), uploadFiles);
 
-router.get('/someImageUrlOnlyForAuthorizedUsers', function(req,res){
-  res.sendFile(path.resolve(__dirname + '/../uploads/4f7176168fb0e49144443d87ee721796.jpg'));
-
-});
-
 async function uploadFiles(req, res) {
+  req.body.picture = req.file.filename;
   const employee = new employeeModel(req.body);
   try {
     const savedUser = await employee.save();
