@@ -37,10 +37,20 @@ router.get("/get-members", async (req, res) => {
     console.log(error);
   }
 });
-router.get("/get-image/:id", async (req, res) => {
-  const user = await employeeModel.findById(req.params.id);
+router.get("/get-image/:id", (req, res) => {
   try {
     res.sendFile(user.picture);
+  } catch (error) {
+    res.send(error);
+  }
+});
+
+router.patch("/update-user/:id", async (req, res) => {
+  try {
+    const user = await employeeModel.findByIdAndUpdate(req.params.id, {
+      point: req.body.point,
+    });
+    res.send({ message: "Update success" });
   } catch (error) {
     res.send(error);
   }
