@@ -23,6 +23,10 @@ const employeeSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  picture: {
+    required: true,
+    type: String,
+  },
   email: {
     required: true,
     type: String,
