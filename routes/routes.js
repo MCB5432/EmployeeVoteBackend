@@ -2,6 +2,7 @@ const express = require("express");
 const employeeModel = require("../models/employee");
 const router = express.Router();
 const multer = require("multer");
+const { default: mongoose } = require("mongoose");
 const upload = multer({ dest: "uploads/" });
 
 router.post("/save-member", upload.single("picture"), uploadFiles);
@@ -16,5 +17,9 @@ async function uploadFiles(req, res) {
     res.status(400).json(error);
   }
 }
+router.get("/get-members", async (req,res => {
+  
+      
+}))
 
 module.exports = router;
