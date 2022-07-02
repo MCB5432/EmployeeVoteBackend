@@ -24,8 +24,9 @@ const employeeSchema = new mongoose.Schema({
     default: 0,
   },
   picture: {
-    required: true,
+    required: false,
     type: String,
+    default: ""
   },
   email: {
     required: true,
