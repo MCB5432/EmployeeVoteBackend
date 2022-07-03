@@ -1,9 +1,11 @@
 const express = require("express");
 const path = require("path");
 const employeeModel = require("../models/employee");
+const eventModel = require("../models/event");
 const router = express.Router();
 const multer = require("multer");
 const { default: mongoose } = require("mongoose");
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "./pics");
@@ -37,7 +39,9 @@ router.get("/get-members", async (req, res) => {
     console.log(error);
   }
 });
-router.get("/get-image/:id", (req, res) => {
+router.get("/get-image/:id", async (req, res) => {
+  const user = await employeeModel.findById(req.params.id);
+
   try {
     res.sendFile(user.picture);
   } catch (error) {
@@ -51,6 +55,23 @@ router.patch("/update-user/:id", async (req, res) => {
       point: req.body.point,
     });
     res.send({ message: "Update success" });
+  } catch (error) {
+    res.send(error);
+  }
+});
+router.post("/event-log", async (req, res) => {
+  const event = new eventModel(req.body);
+  try {
+    const savedEvent = await event.save();
+    res.send({ event: savedEvent, message: "Event log created" });
+  } catch (error) {
+    res.send(error);
+  }
+});
+router.get("/event-log", async (req, res) => {
+  const events = await eventModel.find();
+  try {
+    res.send(events);
   } catch (error) {
     res.send(error);
   }
