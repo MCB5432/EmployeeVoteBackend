@@ -51,10 +51,14 @@ router.get("/get-image/:id", async (req, res) => {
 
 router.patch("/update-user/:id", async (req, res) => {
   try {
-    const user = await employeeModel.findByIdAndUpdate(req.params.id, {
-      point: req.body.point,
-    });
-    res.send({ message: "Update success" });
+    const user = await employeeModel.findByIdAndUpdate(
+      req.params.id,
+      {
+        point: req.body.point,
+      },
+      { new: true }
+    );
+    res.send(user);
   } catch (error) {
     res.send(error);
   }
