@@ -24,7 +24,7 @@ app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use("/api", routes);
 app.get("/", (req, res) => {
-  res.json({ message: "Employee Vote APP started" });
+  res.json({ message: "Employee Vote APP" });
 });
 
 const port = process.env.PORT || 8000;
