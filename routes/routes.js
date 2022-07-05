@@ -4,9 +4,18 @@ const employeeModel = require("../models/employee");
 const eventModel = require("../models/event");
 const router = express.Router();
 const { default: mongoose } = require("mongoose");
-
-
-const upload = multer({ storage: storage });
+const multer = require("multer");
+var storage = multer.diskStorage(
+  {
+      destination: './pics/',
+      filename: function ( req, file, cb ) {
+          //req.body is empty...
+          //How could I get the new_file_name property sent from client here?
+          cb( null, Date.now() + file.originalname);
+      }
+  }
+);
+const upload = multer({ storage: storage});
 
 router.post("/save-member", upload.single("picture"), uploadFiles);
 
