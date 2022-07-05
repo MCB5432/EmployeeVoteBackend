@@ -31,13 +31,9 @@ async function uploadFiles(req, res) {
   } catch (error) {
     res.status(400).json(error);
   }
-<<<<<<< HEAD
 });
 
 
-=======
-}
->>>>>>> parent of 483b52f (add mkdir)
 router.get("/get-members", async (req, res) => {
   const users = await employeeModel.find();
   try {
@@ -46,18 +42,6 @@ router.get("/get-members", async (req, res) => {
     console.log(error);
   }
 });
-<<<<<<< HEAD
-=======
-router.get("/get-image/:id", async (req, res) => {
-  const user = await employeeModel.findById(req.params.id);
-
-  try {
-    res.sendFile(user.picture);
-  } catch (error) {
-    res.send(error);
-  }
-});
->>>>>>> parent of 483b52f (add mkdir)
 
 router.patch("/update-user/:id", async (req, res) => {
   try {
