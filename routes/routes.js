@@ -5,17 +5,6 @@ const eventModel = require("../models/event");
 const router = express.Router();
 const { default: mongoose } = require("mongoose");
 
-router.post("/save-member",async (req,res) => {
-  const employee = new employeeModel(req.body);
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "./pics");
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, Date.now() + "--" + file.originalname);
-  },
-});
 
 const upload = multer({ storage: storage });
 
@@ -31,15 +20,22 @@ async function uploadFiles(req, res) {
   } catch (error) {
     res.status(400).json(error);
   }
-});
-
-
+}
 router.get("/get-members", async (req, res) => {
   const users = await employeeModel.find();
   try {
     res.send(users);
   } catch (error) {
     console.log(error);
+  }
+});
+router.get("/get-image/:id", async (req, res) => {
+  const user = await employeeModel.findById(req.params.id);
+
+  try {
+    res.sendFile(user.picture);
+  } catch (error) {
+    res.send(error);
   }
 });
 
