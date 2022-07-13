@@ -1,21 +1,24 @@
 const express = require("express");
 const path = require("path");
 const employeeModel = require("../models/employee");
+const adminModel = require("../models/admin");
 const eventModel = require("../models/event");
+const bcrypt = require("bcryptjs");
 const router = express.Router();
 const { default: mongoose } = require("mongoose");
 const multer = require("multer");
-var storage = multer.diskStorage(
-  {
-      destination: './pics/',
-      filename: function ( req, file, cb ) {
-          //req.body is empty...
-          //How could I get the new_file_name property sent from client here?
-          cb( null, Date.now() + file.originalname);
-      }
-  }
-);
-const upload = multer({ storage: storage});
+const jwt = require("jsonwebtoken");
+const auth = require("../middleware/auth");
+
+var storage = multer.diskStorage({
+  destination: "./pics/",
+  filename: function (req, file, cb) {
+    //req.body is empty...
+    //How could I get the new_file_name property sent from client here?
+    cb(null, Date.now() + file.originalname);
+  },
+});
+const upload = multer({ storage: storage });
 
 router.post("/save-member", upload.single("picture"), uploadFiles);
 
@@ -78,6 +81,76 @@ router.get("/event-log", async (req, res) => {
   } catch (error) {
     res.send(error);
   }
+});
+router.post("/register", async (req, res) => {
+  try {
+    const { username, email, password } = req.body;
+
+    if (!(email && password && username)) {
+      res.status(400).send("All input is required");
+    }
+
+    const oldUser = await adminModel.findOne({ username });
+
+    if (oldUser) {
+      return res.status(409).send("User Already Exist. Please Login");
+    }
+
+    encryptedPassword = await bcrypt.hash(password, 10);
+
+    const user = await adminModel.create({
+      username,
+      email: email.toLowerCase(),
+      password: encryptedPassword,
+    });
+
+    const token = jwt.sign(
+      { user_id: user._id, username },
+      process.env.TOKEN_KEY,
+      {
+        expiresIn: "2h",
+      }
+    );
+    user.token = token;
+
+    res.status(201).json(user);
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+router.post("/login", async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    if (!(username && password)) {
+      res.status(400).send("All input is required");
+    }
+
+    const user = await adminModel.findOne({ username });
+
+    if (user && (await bcrypt.compare(password, user.password))) {
+      const token = jwt.sign(
+        { user_id: user._id, username },
+        process.env.TOKEN_KEY,
+        {
+          expiresIn: "2h",
+        }
+      );
+
+      user.token = token;
+
+      res.status(200).json(user);
+    }
+    res.status(400).send("Invalid Credentials");
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+router.post("/verify", auth, (req, res) => {
+  console.log(req);
+  res.status(200).send("Welcome 🙌 ");
 });
 
 module.exports = router;
