@@ -65,6 +65,14 @@ router.patch("/update-user/:id", async (req, res) => {
     res.send(error);
   }
 });
+router.delete("/delete-user/:id", async (req, res) => {
+  try {
+    await employeeModel.findByIdAndDelete(req.params.id);
+    res.send("User deleted!");
+  } catch (err) {
+    res.send(err);
+  }
+});
 router.post("/event-log", async (req, res) => {
   const event = new eventModel(req.body);
   try {
@@ -122,27 +130,24 @@ router.post("/register", async (req, res) => {
 router.post("/login", async (req, res) => {
   try {
     const { username, password } = req.body;
-
     if (!(username && password)) {
       res.status(400).send("All input is required");
     }
 
     const user = await adminModel.findOne({ username });
 
-    if (user && (await bcrypt.compare(password, user.password))) {
-      const token = jwt.sign(
-        { user_id: user._id, username },
-        process.env.TOKEN_KEY,
-        {
-          expiresIn: "2h",
-        }
-      );
-
-      user.token = token;
-
-      res.status(200).json(user);
+    if (!(user && (await bcrypt.compare(password, user.password)))) {
+      res.status(400).send("Invalid Credentials");
     }
-    res.status(400).send("Invalid Credentials");
+    const token = jwt.sign(
+      { user_id: user._id, username },
+      process.env.TOKEN_KEY,
+      {
+        expiresIn: "2h",
+      }
+    );
+    user.token = token;
+    res.status(200).json(user);
   } catch (err) {
     console.log(err);
   }
